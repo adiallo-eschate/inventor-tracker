@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/utils/supabase/server';
 
-// Stripe & Supabase setup
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -10,9 +10,6 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser()
-  const customer_email = user?.email
-  const customer_user_id = user?.id
 
   const body = await request.text();
   const signature = request.headers.get('stripe-signature')!;
@@ -33,8 +30,8 @@ export async function POST(request: Request) {
       const limits = getLimitsForPlan(plan);
 
       const { error } = await supabase.from('subscriptions').upsert({
-        user_id:customer_user_id,
-        email: customer_email,                //session.customer_email,
+        user_id: session.metadata?.user_id,
+        email: session?.customer_email,                //session.customer_email,
         plan,
         limits,
         stripe_info: session,
@@ -46,14 +43,13 @@ export async function POST(request: Request) {
 
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
-      const customerEmail = customer_email;
 
       const plan = getPlanFromPriceId(subscription.items.data[0].price.id);
       const limits = getLimitsForPlan(plan);
 
       const { error } = await supabase.from('subscriptions').upsert({
-        user_id: customer_user_id,
-        email: customerEmail,
+        user_id: subscription.metadata?.user_id,
+        email: subscription.metadata?.email,
         plan,
         limits,
         stripe_info: subscription,
