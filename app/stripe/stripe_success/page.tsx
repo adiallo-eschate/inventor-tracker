@@ -1,6 +1,6 @@
 "use client";
 
-export default async function StripeSuccess(){
+export default function StripeSuccess(){
 
     return (
         <>
