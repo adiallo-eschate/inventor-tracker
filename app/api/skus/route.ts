@@ -1,5 +1,5 @@
 // this api gets all the skus to render in the frontend
-
+import { NextResponse } from "next/server";
 import {createClient } from "@/utils/supabase/server"
 
 
@@ -9,11 +9,11 @@ export default async function GET(req:Request){
 
     if (error) {
       console.error("Error fetching SKUs:", error);
-      return;
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     console.log("Fetched SKUs:", JSON.stringify(skus_data, null, 2));
-    return Response.json(skus_data)
+     return NextResponse.json(skus_data);
 }
 
 
