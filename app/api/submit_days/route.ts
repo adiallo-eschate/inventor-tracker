@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
-export async function POST(req:Request){
+export async function POST(req:NextRequest){
     const formData = req.formData()
     const days = Number((await formData).get("cuttOffDays"))
     console.log("The number of days choosen is:", days)
@@ -22,6 +23,6 @@ export async function POST(req:Request){
     if (error) console.log(error)
     if (error) throw new Error("Error Retrieving Products: Edge Function", error.message)
     console.log(data)
-    return new Response(JSON.stringify({data:data}), {status:200})
+    return new NextResponse(JSON.stringify({data:data}), {status:200})
 
 }
