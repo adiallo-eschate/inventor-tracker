@@ -56,7 +56,7 @@ switch (event.type) {
           limits,
           stripe_info: session,
         })
-        .eq('user_id', userId)//session.metadata?.user_id);
+        .eq('stripe_user_id', userId)//session.metadata?.user_id);
 
       if (updateResult.error) {
         console.error('Supabase update error (session.completed):', updateResult.error);
@@ -95,7 +95,7 @@ switch (event.type) {
           limits,
           stripe_info: subscription,
         })
-        .eq('user_id', userId)//subscription.metadata?.user_id);
+        .eq('stripe_user_id', userId)//subscription.metadata?.user_id);
 
       if (updateResult.error) {
         console.error('Supabase update error (subscription.updated):', updateResult.error);
