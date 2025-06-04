@@ -50,20 +50,29 @@ export async function POST(request: Request) {
       const plan = getPlanFromPriceId(subscription.items.data[0].price.id);
       const limits = getLimitsForPlan(plan);
 
-      const { error } = await supabase.from('subscriptions').upsert({
-        user_id: subscription.metadata?.user_id,
-        email: subscription.metadata?.email,
-        plan,
-        limits,
-        stripe_info: subscription,
-      }, {
-        onConflict: 'id'
-      })
-      .select();
+      const insertResult = await supabase.from('subscriptions').insert({
+          user_id: subscription.metadata?.user_id,
+          email: subscription.metadata?.email,
+          plan,
+          limits,
+          stripe_info: subscription,
+        });
 
-      if (error) console.error('Supabase upsert error (subscription.updated):', error);
-      break;
+        if (insertResult.error) {
+          const updateResult = await supabase.from('subscriptions')
+            .update({
+              plan,
+              limits,
+              stripe_info: subscription,
+            })
+            .eq('user_id', subscription.metadata?.user_id);
+
+    if (updateResult.error) {
+        console.error('Supabase update error (subscription.updated):', updateResult.error);
+        break;
+        }
     }
+}
 
     case 'checkout.session.expired': {
       const session = event.data.object as Stripe.Checkout.Session;
