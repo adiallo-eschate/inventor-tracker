@@ -40,7 +40,7 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
-      user_id: userId,                                     //session.metadata?.user_id,
+      stripe_user_id: userId,                                     //session.metadata?.user_id,
       email: session?.customer_email,
       plan,
       limits,
@@ -70,7 +70,7 @@ switch (event.type) {
     const subscription = event.data.object as Stripe.Subscription;
 
     console.log("This is the subscription object:", subscription)
-    
+
     const userId = subscription.metadata?.user_id;
      if (!userId) {
         console.error('Missing user_id in session metadata');
@@ -80,7 +80,7 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
-      user_id: userId,                                      //subscription.metadata?.user_id,
+      stripe_user_id: userId,                                      //subscription.metadata?.user_id,
       email: subscription.metadata?.email,
       plan,
       limits,
