@@ -1,6 +1,37 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@/utils/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+
+// server client with service role key 
+const createClient = async ()=>{
+
+    const cookieStore = await cookies();
+    
+    return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    },
+  );
+}
 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -29,11 +60,7 @@ switch (event.type) {
 
     console.log("This is the session data:", session)
 
-    const response = await fetch('https://deadstockalert.vercel.app/api/getUser')
-    const result = await response.json()
-    const auth_user_id = result.userId
-
-
+ 
     const userId = session.id;
      if (!userId) {
         console.log("userId returned:", userId)
@@ -45,7 +72,6 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
-      user_id: auth_user_id,
       stripe_user_id: userId,                                     //session.metadata?.user_id,
       email: session?.customer_email,
       plan:plan,
@@ -79,10 +105,6 @@ switch (event.type) {
 
     console.log("This is the subscription object:", subscription)
 
-    const response = await fetch('https://deadstockalert.vercel.app/api/getUser')
-    const result = await response.json()
-    const auth_user_id = result.userId
-
     const userId = subscription.metadata?.user_id;
      if (!userId) {
         console.error('Missing user_id in session metadata');
@@ -92,7 +114,6 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
-      user_id: auth_user_id,
       stripe_user_id: userId,                                      //subscription.metadata?.user_id,
       email: subscription.metadata?.email,
       plan:plan,
