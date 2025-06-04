@@ -42,18 +42,20 @@ switch (event.type) {
     const insertResult = await supabase.from('subscriptions').insert({
       stripe_user_id: userId,                                     //session.metadata?.user_id,
       email: session?.customer_email,
-      plan,
-      limits,
+      plan:plan,
+      limits:limits,
       stripe_info: session,
-    });
+    }).select();
+
+    console.log("Inserted data:", insertResult)
 
     if (insertResult.error) {
       const updateResult = await supabase
         .from('subscriptions')
         .update({
           email: session?.customer_email,
-          plan,
-          limits,
+          plan:plan,
+          limits:limits,
           stripe_info: session,
         })
         .eq('stripe_user_id', userId)//session.metadata?.user_id);
@@ -82,8 +84,8 @@ switch (event.type) {
     const insertResult = await supabase.from('subscriptions').insert({
       stripe_user_id: userId,                                      //subscription.metadata?.user_id,
       email: subscription.metadata?.email,
-      plan,
-      limits,
+      plan:plan,
+      limits:limits,
       stripe_info: subscription,
     });
 
@@ -91,8 +93,8 @@ switch (event.type) {
       const updateResult = await supabase
         .from('subscriptions')
         .update({
-          plan,
-          limits,
+          plan:plan,
+          limits:limits,
           stripe_info: subscription,
         })
         .eq('stripe_user_id', userId)//subscription.metadata?.user_id);
