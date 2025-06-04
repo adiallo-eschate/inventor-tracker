@@ -26,6 +26,12 @@ switch (event.type) {
   case 'checkout.session.completed': {
     const session = event.data.object as Stripe.Checkout.Session;
 
+      const userId = session.metadata?.user_id;
+     if (!userId) {
+        console.error('Missing user_id in session metadata');
+        break;
+    }
+    
     const plan = getPlanFromPriceId(session?.metadata?.price_id);
     const limits = getLimitsForPlan(plan);
 
@@ -59,6 +65,11 @@ switch (event.type) {
   case 'customer.subscription.updated': {
     const subscription = event.data.object as Stripe.Subscription;
 
+      const userId = subscription.metadata?.user_id;
+    if (!userId) {
+        console.error('Missing user_id in session metadata');
+        break;
+    }
     const plan = getPlanFromPriceId(subscription.items.data[0].price.id);
     const limits = getLimitsForPlan(plan);
 
