@@ -29,6 +29,11 @@ switch (event.type) {
 
     console.log("This is the session data:", session)
 
+    const response = await fetch('https://deadstockalert.vercel.app/api/getUser')
+    const result = await response.json()
+    const auth_user_id = result.userId
+
+
     const userId = session.id;
      if (!userId) {
         console.log("userId returned:", userId)
@@ -40,6 +45,7 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
+      user_id: auth_user_id,
       stripe_user_id: userId,                                     //session.metadata?.user_id,
       email: session?.customer_email,
       plan:plan,
@@ -73,6 +79,10 @@ switch (event.type) {
 
     console.log("This is the subscription object:", subscription)
 
+    const response = await fetch('https://deadstockalert.vercel.app/api/getUser')
+    const result = await response.json()
+    const auth_user_id = result.userId
+
     const userId = subscription.metadata?.user_id;
      if (!userId) {
         console.error('Missing user_id in session metadata');
@@ -82,6 +92,7 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
+      user_id: auth_user_id,
       stripe_user_id: userId,                                      //subscription.metadata?.user_id,
       email: subscription.metadata?.email,
       plan:plan,
