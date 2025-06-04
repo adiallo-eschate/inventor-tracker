@@ -25,8 +25,16 @@ export async function POST(request: Request) {
 switch (event.type) {
   case 'checkout.session.completed': {
     const session = event.data.object as Stripe.Checkout.Session;
+    const supabase = await createClient()
 
-      const userId = session.metadata?.user_id;
+    const {data:{ user }, error } = await supabase.auth.getUser()
+
+    if (error){
+        console.error("Could Not Retrieve User Auth Information")
+    } 
+
+    const userId = user?.id
+     // const userId = session.metadata?.user_id;
      if (!userId) {
         console.error('Missing user_id in session metadata');
         break;
@@ -36,7 +44,7 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
-      user_id: session.metadata?.user_id,
+      user_id: userId,                                     //session.metadata?.user_id,
       email: session?.customer_email,
       plan,
       limits,
@@ -52,7 +60,7 @@ switch (event.type) {
           limits,
           stripe_info: session,
         })
-        .eq('user_id', session.metadata?.user_id);
+        .eq('user_id', userId)//session.metadata?.user_id);
 
       if (updateResult.error) {
         console.error('Supabase update error (session.completed):', updateResult.error);
@@ -65,8 +73,10 @@ switch (event.type) {
   case 'customer.subscription.updated': {
     const subscription = event.data.object as Stripe.Subscription;
 
-      const userId = subscription.metadata?.user_id;
-    if (!userId) {
+     // const userId = subscription.metadata?.user_id;
+    const { data:{ user }, error } = await supabase.auth.getUser()
+    const userId = user?.id
+     if (!userId) {
         console.error('Missing user_id in session metadata');
         break;
     }
@@ -74,7 +84,7 @@ switch (event.type) {
     const limits = getLimitsForPlan(plan);
 
     const insertResult = await supabase.from('subscriptions').insert({
-      user_id: subscription.metadata?.user_id,
+      user_id: userId,                                      //subscription.metadata?.user_id,
       email: subscription.metadata?.email,
       plan,
       limits,
@@ -89,7 +99,7 @@ switch (event.type) {
           limits,
           stripe_info: subscription,
         })
-        .eq('user_id', subscription.metadata?.user_id);
+        .eq('user_id', userId)//subscription.metadata?.user_id);
 
       if (updateResult.error) {
         console.error('Supabase update error (subscription.updated):', updateResult.error);
