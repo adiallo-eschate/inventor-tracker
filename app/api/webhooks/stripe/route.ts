@@ -28,14 +28,17 @@ export async function POST(request: Request) {
 
       const plan = getPlanFromPriceId(session?.metadata?.price_id);
       const limits = getLimitsForPlan(plan);
-
+      
       const { error } = await supabase.from('subscriptions').upsert({
         user_id: session.metadata?.user_id,
         email: session?.customer_email,                //session.customer_email,
         plan,
         limits,
         stripe_info: session,
-      });
+      }, {
+        onConflict: 'user_id'
+      })
+      .select();
 
       if (error) console.error('Supabase upsert error (session.completed):', error);
       break;
@@ -53,7 +56,10 @@ export async function POST(request: Request) {
         plan,
         limits,
         stripe_info: subscription,
-      });
+      }, {
+        onConflict: 'user_id'
+      })
+      .select();
 
       if (error) console.error('Supabase upsert error (subscription.updated):', error);
       break;
