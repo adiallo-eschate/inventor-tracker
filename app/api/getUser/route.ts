@@ -6,6 +6,7 @@ export async function GET(){
     const { data:{ user }, error } = await supabase.auth.getUser()
 
     if (error){
+        console.error(error)
         console.error("Could not get user auth information")
     }
     const userId = user?.id
