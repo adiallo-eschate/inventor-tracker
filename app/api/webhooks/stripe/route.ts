@@ -22,70 +22,88 @@ export async function POST(request: Request) {
     return new NextResponse(`Webhook Error: ${(err as Error).message}`, { status: 400 });
   }
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
+switch (event.type) {
+  case 'checkout.session.completed': {
+    const session = event.data.object as Stripe.Checkout.Session;
 
-      const plan = getPlanFromPriceId(session?.metadata?.price_id);
-      const limits = getLimitsForPlan(plan);
-      
-      const { error } = await supabase.from('subscriptions').upsert({
-        user_id: session.metadata?.user_id,
-        email: session?.customer_email,                //session.customer_email,
-        plan,
-        limits,
-        stripe_info: session,
-      }, {
-        onConflict: 'id'
-      })
-      .select();
+    const plan = getPlanFromPriceId(session?.metadata?.price_id);
+    const limits = getLimitsForPlan(plan);
 
-      if (error) console.error('Supabase upsert error (session.completed):', error);
-      break;
+    const insertResult = await supabase.from('subscriptions').insert({
+      user_id: session.metadata?.user_id,
+      email: session?.customer_email,
+      plan,
+      limits,
+      stripe_info: session,
+    });
+
+    if (insertResult.error) {
+      const updateResult = await supabase
+        .from('subscriptions')
+        .update({
+          email: session?.customer_email,
+          plan,
+          limits,
+          stripe_info: session,
+        })
+        .eq('user_id', session.metadata?.user_id);
+
+      if (updateResult.error) {
+        console.error('Supabase update error (session.completed):', updateResult.error);
+      }
     }
 
-    case 'customer.subscription.updated': {
-      const subscription = event.data.object as Stripe.Subscription;
+    break;
+  }
 
-      const plan = getPlanFromPriceId(subscription.items.data[0].price.id);
-      const limits = getLimitsForPlan(plan);
+  case 'customer.subscription.updated': {
+    const subscription = event.data.object as Stripe.Subscription;
 
-      const insertResult = await supabase.from('subscriptions').insert({
-          user_id: subscription.metadata?.user_id,
-          email: subscription.metadata?.email,
+    const plan = getPlanFromPriceId(subscription.items.data[0].price.id);
+    const limits = getLimitsForPlan(plan);
+
+    const insertResult = await supabase.from('subscriptions').insert({
+      user_id: subscription.metadata?.user_id,
+      email: subscription.metadata?.email,
+      plan,
+      limits,
+      stripe_info: subscription,
+    });
+
+    if (insertResult.error) {
+      const updateResult = await supabase
+        .from('subscriptions')
+        .update({
           plan,
           limits,
           stripe_info: subscription,
-        });
+        })
+        .eq('user_id', subscription.metadata?.user_id);
 
-        if (insertResult.error) {
-          const updateResult = await supabase.from('subscriptions')
-            .update({
-              plan,
-              limits,
-              stripe_info: subscription,
-            })
-            .eq('user_id', subscription.metadata?.user_id);
-
-    if (updateResult.error) {
+      if (updateResult.error) {
         console.error('Supabase update error (subscription.updated):', updateResult.error);
-        break;
-        }
+      }
     }
+
+    break;
+  }
+
+  case 'checkout.session.expired': {
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    const { error } = await supabase
+      .from('subscriptions')
+      .delete()
+      .eq('email', session.customer_email);
+
+    if (error) console.error('Supabase delete error (session.expired):', error);
+    break;
+  }
+
+  default:
+    console.log(`Unhandled event type: ${event.type}`);
 }
 
-    case 'checkout.session.expired': {
-      const session = event.data.object as Stripe.Checkout.Session;
-
-      const { error } = await supabase.from('subscriptions').delete().eq('email', session.customer_email);
-
-      if (error) console.error('Supabase delete error (session.expired):', error);
-      break;
-    }
-
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
-  }
 
   return NextResponse.json({ received: true });
 }
