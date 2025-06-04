@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         limits,
         stripe_info: session,
       }, {
-        onConflict: 'user_id'
+        onConflict: 'id'
       })
       .select();
 
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         limits,
         stripe_info: subscription,
       }, {
-        onConflict: 'user_id'
+        onConflict: 'id'
       })
       .select();
 
