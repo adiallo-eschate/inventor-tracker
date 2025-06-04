@@ -27,15 +27,18 @@ switch (event.type) {
     const session = event.data.object as Stripe.Checkout.Session;
     const supabase = await createClient()
 
+    console.log("This is the session data:", session)
     const {data:{ user }, error } = await supabase.auth.getUser()
 
     if (error){
+        console.log("Error returned by auth.getUser()",error)
         console.error("Could Not Retrieve User Auth Information")
     } 
 
     const userId = user?.id
      // const userId = session.metadata?.user_id;
      if (!userId) {
+        console.log("userId returned:", userId)
         console.error('Missing user_id in session metadata');
         break;
     }
