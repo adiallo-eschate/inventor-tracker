@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       metadata:{
         price_id: priceId,
         user_id: user.id,
-        email: user.email ?? ''
+        customer_email: user.email ?? ''
       }
     });
 

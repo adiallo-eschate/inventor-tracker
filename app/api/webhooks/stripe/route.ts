@@ -73,7 +73,7 @@ switch (event.type) {
 
     const insertResult = await supabase.from('subscriptions').insert({
       stripe_user_id: userId,                                     //session.metadata?.user_id,
-      email: session?.customer_email,
+      email: session?.metadata?.customer_email,
       plan:plan,
       limits:limits,
       stripe_info: session,
@@ -85,7 +85,8 @@ switch (event.type) {
       const updateResult = await supabase
         .from('subscriptions')
         .update({
-          email: session?.customer_email,
+          stripe_user_id: userId,
+          email: session?.metadata?.customer_email,
           plan:plan,
           limits:limits,
           stripe_info: session,
