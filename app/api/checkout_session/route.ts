@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const { data: existingSub  , error} = await supabase.from('subscriptions')
     .select('*')
     .eq('email', user.email)
-    .maybeSingle()
+    
     
     if (error){
       console.log("Could Not Retrieve stripe_user_id from supabase")
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     console.log("current users email: ", user.email)
     console.log("returd from supabase", existingSub)
     
-    let stripeCustomerId = existingSub?.stripe_user_id
+    let stripeCustomerId = existingSub?.[0]?.stripe_user_id
 
     console.log("stripeCustomerid: ", stripeCustomerId)
 
