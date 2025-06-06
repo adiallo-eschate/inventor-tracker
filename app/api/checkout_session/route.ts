@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     console.log("isActive is: ", isActive)
     //console.log("subscriptionId if any: ", subscriptionId)
 
-    if (isActive && activeSub?.id){
+    if (isActive){
       // update db first
 
       //const {error} = await supabase.from('subscriptions').upsert({
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
-      customer: stripeCustomerId ?? undefined,
+      customer: stripeCustomerId, //?? undefined,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_success',
       cancel_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_failure',
