@@ -21,10 +21,11 @@ export async function POST(request: Request) {
     console.log("priceId: ", priceId)
 
     const { data: existingSub } = await supabase.from('subscriptions')
-    .select('stripe_user_id, stripe_info')
+    .select('stripe_user_id')
     .eq('email', user.email)
     .maybeSingle()
     
+    console.log("returd from supabase", existingSub)
     let stripeCustomerId = existingSub?.stripe_user_id
 
     console.log("stripeCustomerid: ", stripeCustomerId)
