@@ -52,13 +52,19 @@ export async function POST(request: Request) {
 
     console.log("subscriptions retured from stripe:  ", subscriptions)
 
-    const subscription = subscriptions.data[0];
-    const isActive = subscription.status === 'active' || false;
+    const subscription = subscriptions.data?.[0];
+
+    if(!subscription){
+      console.log("Could not find a subscription for the user")
+    }
+
+    const isActive = subscription?.status === 'active';
     const subscriptionId = subscription?.id
 
     console.log("isActive is: ", isActive)
+    console.log("subscriptionId if any: ", subscriptionId)
 
-    if (isActive){
+    if (isActive && subscriptionId){
       // update db first
 
       const {error} = await supabase.from('subscriptions').upsert({
