@@ -18,12 +18,16 @@ export async function POST(request: Request) {
 
     const { priceId } = await request.json();
 
+    console.log("priceId: ", priceId)
+
     const { data: existingSub } = await supabase.from('subscriptions')
     .select('stripe_user_id, stripe_info')
     .eq('email', user.email)
     .maybeSingle()
     
     let stripeCustomerId = existingSub?.stripe_user_id
+
+    console.log("stripeCustomerid: ", stripeCustomerId)
 
     if (!stripeCustomerId){
       const customer = await stripe.customers.create({
@@ -34,6 +38,8 @@ export async function POST(request: Request) {
       })
 
       stripeCustomerId = customer.id
+
+      console.log("user did not exist and this is the new returned customer id ", stripeCustomerId)
     }
 
 
@@ -44,13 +50,15 @@ export async function POST(request: Request) {
       limit: 1
     })
 
+    console.log("subscriptions retured from stripe:  ", subscriptions)
+
     const subscription = subscriptions.data[0];
     const isActive = subscription.status === 'active';
     const subscriptionId = subscription?.id
 
     if (isActive){
       // update db first
-
+      
       const {error} = await supabase.from('subscriptions').upsert({
         stripe_user_id: stripeCustomerId,
         email: user.email,
@@ -70,8 +78,6 @@ export async function POST(request: Request) {
       return NextResponse.json({url: billingPortalSession.url})
 
     }
-
-
 
 
     const session = await stripe.checkout.sessions.create({
