@@ -56,9 +56,11 @@ export async function POST(request: Request) {
     const isActive = subscription.status === 'active';
     const subscriptionId = subscription?.id
 
+    console.log("isActive is: ", isActive)
+
     if (isActive){
       // update db first
-      
+
       const {error} = await supabase.from('subscriptions').upsert({
         stripe_user_id: stripeCustomerId,
         email: user.email,
