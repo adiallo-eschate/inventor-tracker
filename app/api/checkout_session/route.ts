@@ -18,15 +18,73 @@ export async function POST(request: Request) {
 
     const { priceId } = await request.json();
 
+    const { data: existingSub } = await supabase.from('subscriptions')
+    .select('stripe_user_id, stripe_info')
+    .eq('email', user.email)
+    .maybeSingle()
+    
+    let stripeCustomerId = existingSub?.stripe_user_id
+
+    if (!stripeCustomerId){
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          user_id: user.id
+        }
+      })
+
+      stripeCustomerId = customer.id
+    }
+
+
+    // check if user has active subs if not create checkout session
+    const subscriptions = await stripe.subscriptions.list({
+      customer: stripeCustomerId,
+      status: 'all',
+      limit: 1
+    })
+
+    const subscription = subscriptions.data[0];
+    const isActive = subscription.status === 'active';
+    const subscriptionId = subscription?.id
+
+    if (isActive){
+      // update db first
+
+      const {error} = await supabase.from('subscriptions').upsert({
+        stripe_user_id: stripeCustomerId,
+        email: user.email,
+        stripe_info: subscription,
+      })
+
+      if (error){
+        console.log("Could not update customers information in the subscriptions table api/checkout_session")
+      }
+      // open portal for the existing customer
+
+      const billingPortalSession = await stripe.billingPortal.sessions.create({
+            customer: stripeCustomerId,
+            return_url: 'https://deadstockalert.vercel.app/dashboard/skus',
+      })
+
+      return NextResponse.json({url: billingPortalSession.url})
+
+    }
+
+
+
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
-      customer_email: user?.email,
+      customer: stripeCustomerId ?? undefined,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_success',
       cancel_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_failure',
       metadata:{
-        price_id: priceId
+        price_id: priceId,
+        user_id: user.id,
+        email: user.email ?? ''
       }
     });
 
