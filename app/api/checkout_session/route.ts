@@ -54,6 +54,8 @@ export async function POST(request: Request) {
 
     //const subscription = subscriptions.data?.[0];
     const activeSub = subscriptions.data.find(sub => sub.status === 'active');
+
+    console.log("active subscriptions: ", activeSub)
     
     if(!activeSub){
       console.log("Could not find a subscription for the user")
