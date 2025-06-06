@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     console.log("subscriptions retured from stripe:  ", subscriptions)
 
     const subscription = subscriptions.data[0];
-    const isActive = subscription.status === 'active';
+    const isActive = subscription.status === 'active' || false;
     const subscriptionId = subscription?.id
 
     console.log("isActive is: ", isActive)
