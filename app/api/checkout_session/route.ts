@@ -47,35 +47,37 @@ export async function POST(request: Request) {
     const subscriptions = await stripe.subscriptions.list({
       customer: stripeCustomerId,
       status: 'all',
-      limit: 1
+      limit: 10
     })
 
     console.log("subscriptions retured from stripe:  ", subscriptions)
 
-    const subscription = subscriptions.data?.[0];
-
-    if(!subscription){
+    //const subscription = subscriptions.data?.[0];
+    const activeSub = subscriptions.data.find(sub => sub.status === 'active');
+    
+    if(!activeSub){
       console.log("Could not find a subscription for the user")
     }
 
-    const isActive = subscription?.status === 'active';
-    const subscriptionId = subscription?.id
+    const isActive = !!activeSub                             //subscription?.status === 'active';
+    //const subscriptionId = subscription?.id
 
     console.log("isActive is: ", isActive)
-    console.log("subscriptionId if any: ", subscriptionId)
+    //console.log("subscriptionId if any: ", subscriptionId)
 
-    if (isActive && subscriptionId){
+    if (isActive && activeSub?.id){
       // update db first
 
-      const {error} = await supabase.from('subscriptions').upsert({
-        stripe_user_id: stripeCustomerId,
-        email: user.email,
-        stripe_info: subscription,
-      })
+      //const {error} = await supabase.from('subscriptions').upsert({
+      //  stripe_user_id: stripeCustomerId,
+      //  email: user.email,
+      //  stripe_info: subscription,
+      //})
 
-      if (error){
-        console.log("Could not update customers information in the subscriptions table api/checkout_session")
-      }
+      //if (error){
+      //  console.log("Could not update customers information in the subscriptions table api/checkout_session")
+      //}
+
       // open portal for the existing customer
 
       const billingPortalSession = await stripe.billingPortal.sessions.create({
