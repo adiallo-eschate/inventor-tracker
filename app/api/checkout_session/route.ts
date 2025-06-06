@@ -23,8 +23,11 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       customer_email: user?.email,
       line_items: [{ price: priceId, quantity: 1 }],
-       success_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_success',
+      success_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_success',
       cancel_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_failure',
+      metadata:{
+        price_id: priceId
+      }
     });
 
     return NextResponse.json({ url: session.url });

@@ -161,9 +161,9 @@ switch (event.type) {
 
 function getPlanFromPriceId(priceId: string | undefined) {
   if (!priceId) return 'unknown';
-  if (priceId === 'price_1RVfdcRxxyfmlGjIqHXumet6') return 'free';
-  if (priceId === 'price_1RVfeBRxxyfmlGjIveeq6KTK') return 'starter';
-  if (priceId === 'price_1RVfegRxxyfmlGjI8Ketv6yI') return 'pro'
+  if (priceId === process.env.STRIPE_FREE_PLAN!) return 'free';
+  if (priceId === process.env.STRIPE_STARTER_PLAN) return 'starter';
+  if (priceId === process.env.STRIPE_PRO_PLAN) return 'pro'
   return 'custom';
 }
 
