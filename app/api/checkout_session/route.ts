@@ -25,6 +25,9 @@ export async function POST(request: Request) {
     .eq('email', user.email)
     .maybeSingle()
     
+
+    console.log("current User: ", user)
+    console.log("current users email: ", user.email)
     console.log("returd from supabase", existingSub)
     let stripeCustomerId = existingSub?.stripe_user_id
 
