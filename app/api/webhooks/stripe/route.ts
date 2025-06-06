@@ -101,44 +101,39 @@ switch (event.type) {
     break;
   }
 
-  case 'customer.subscription.updated': {
-    const subscription = event.data.object as Stripe.Subscription;
+case 'customer.subscription.updated': {
+  const subscription = event.data.object as Stripe.Subscription;
+  
+  console.log("This is the subscription object:", subscription);
 
-    console.log("This is the subscription object:", subscription)
+  const supabaseUserId = subscription.metadata?.user_id;
+  const stripeCustomerId = subscription.customer as string;
+  const email = subscription.metadata?.email;
 
-    const userId = subscription.metadata?.user_id;
-     if (!userId) {
-        console.error('Missing user_id in session metadata');
-        break;
-    }
-    const plan = getPlanFromPriceId(subscription.items.data[0].price.id);
-    const limits = getLimitsForPlan(plan);
-
-    const insertResult = await supabase.from('subscriptions').insert({
-      stripe_user_id: userId,                                      //subscription.metadata?.user_id,
-      email: subscription.metadata?.email,
-      plan:plan,
-      limits:limits,
-      stripe_info: subscription,
-    });
-
-    if (insertResult.error) {
-      const updateResult = await supabase
-        .from('subscriptions')
-        .update({
-          plan:plan,
-          limits:limits,
-          stripe_info: subscription,
-        })
-        .eq('stripe_user_id', userId)//subscription.metadata?.user_id);
-
-      if (updateResult.error) {
-        console.error('Supabase update error (subscription.updated):', updateResult.error);
-      }
-    }
-
+  if (!supabaseUserId || !stripeCustomerId) {
+    console.error('Missing user_id or customer_id in subscription metadata');
     break;
   }
+
+  const priceId = subscription.items.data[0]?.price?.id;
+  const plan = getPlanFromPriceId(priceId);
+  const limits = getLimitsForPlan(plan);
+
+  const { error } = await supabase.from('subscriptions').upsert({
+    stripe_user_id: stripeCustomerId,
+    email,
+    plan,
+    limits,
+    stripe_info: subscription,
+  }, { onConflict: 'stripe_user_id' }); // assumes stripe_user_id is unique
+
+  if (error) {
+    console.error('Supabase upsert error (subscription.updated):', error);
+  }
+
+  break;
+}
+
 
   case 'checkout.session.expired': {
     const session = event.data.object as Stripe.Checkout.Session;
