@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     console.log("priceId: ", priceId)
 
-    const { data, error} = await supabase.from('subscriptions').select().eq('id', 28)
+    const { data, error} = await supabase.from('subscriptions').select()
   
     
     if (error){
