@@ -55,53 +55,43 @@ export async function POST(request: Request) {
 
 switch (event.type) {
   case 'checkout.session.completed': {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const supabase = await createClient()
+  const session = event.data.object as Stripe.Checkout.Session;
+  const supabase = await createClient();
 
-    console.log("This is the session data:", session)
+  console.log("This is the session data:", session);
 
- 
-    const userId = session.id;
-    const customerId = session.customer;
+  const customerId = session.customer as string;
+  const email = session.metadata?.customer_email ?? session.customer_email ?? session?.metadata?.customer_email;
+  const userId = session.metadata?.user_id; // optional: for tracking Supabase user
 
-     if (!userId || !customerId) {
-        console.log("userId returned:", userId)
-        console.error('Missing user_id in session metadata');
-        break;
-    }
-    
-    const plan = getPlanFromPriceId(session?.metadata?.price_id);
-    const limits = getLimitsForPlan(plan);
-
-    const insertResult = await supabase.from('subscriptions').insert({
-      stripe_user_id: customerId,                                     //session.metadata?.user_id,
-      email: session?.metadata?.customer_email,
-      plan:plan,
-      limits:limits,
-      stripe_info: session,
-    }).select();
-
-    console.log("Inserted data:", insertResult)
-
-    if (insertResult.error) {
-      const updateResult = await supabase
-        .from('subscriptions')
-        .update({
-          stripe_user_id: customerId,
-          email: session?.metadata?.customer_email,
-          plan:plan,
-          limits:limits,
-          stripe_info: session,
-        })
-        .eq('stripe_user_id', userId)//session.metadata?.user_id);
-
-      if (updateResult.error) {
-        console.error('Supabase update error (session.completed):', updateResult.error);
-      }
-    }
-
+  if (!customerId || !email) {
+    console.error('Missing customer_id or email in session metadata');
     break;
   }
+
+  const plan = getPlanFromPriceId(session.metadata?.price_id);
+  const limits = getLimitsForPlan(plan);
+
+  const { error } = await supabase.from('subscriptions').upsert(
+    {
+      stripe_user_id: customerId,
+      email,
+      plan,
+      limits,
+      stripe_info: session,
+    },
+    {
+      onConflict: 'stripe_user_id', // requires UNIQUE constraint
+    }
+  );
+
+  if (error) {
+    console.error('Supabase upsert error (session.completed):', error);
+  }
+
+  break;
+}
+
 
 case 'customer.subscription.updated': {
   const subscription = event.data.object as Stripe.Subscription;
