@@ -20,19 +20,19 @@ export async function POST(request: Request) {
 
     console.log("priceId: ", priceId)
 
-    const { data: existingSub  , error} = await supabase.from('subscriptions')
-    .select('*')
-    .eq('email', user.email)
-    
+    const { data, error} = await supabase.from('subscriptions')
+    .select()
+    //.eq('email', user.email)
+  
     
     if (error){
       console.log("Could Not Retrieve stripe_user_id from supabase")
     }
 
     console.log("current users email: ", user.email)
-    console.log("returd from supabase", existingSub)
+    console.log("returd from supabase", data)
     
-    let stripeCustomerId = existingSub?.[0]?.stripe_user_id
+    let stripeCustomerId = data?.[0]?.stripe_user_id
 
     console.log("stripeCustomerid: ", stripeCustomerId)
 
