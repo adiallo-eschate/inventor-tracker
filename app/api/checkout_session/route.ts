@@ -18,22 +18,27 @@ export async function POST(request: Request) {
 
     console.log("second")
 
-    const { priceId, data } = await request.json();
+    const { priceId } = await request.json();
+    const user_email = user.email
 
     console.log("third")
     console.log("priceId: ", priceId)  
     
 
-    console.log("current users email: ", user.email)
-    console.log("returd from supabase", data)
-    
-    let stripeCustomerId = data?.stripe_user_id
+    console.log("current users email: ", user_email)
+
+    const customers = await stripe.customers.list({
+      email: user_email!,
+      limit: 1
+    })
+
+    let stripeCustomerId = customers.data[0]?.id
 
     console.log("stripeCustomerid: ", stripeCustomerId)
 
     if (!stripeCustomerId){
       const customer = await stripe.customers.create({
-        email: user.email,
+        email: user_email!,
         metadata: {
           user_id: user.id
         }
