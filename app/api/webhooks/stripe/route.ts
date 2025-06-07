@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 
 // server client with service role key 
-export const createClient = async ()=>{
+const createClient = async ()=>{
 
     const cookieStore = await cookies();
     
