@@ -20,9 +20,7 @@ export async function POST(request: Request) {
 
     console.log("priceId: ", priceId)
 
-    const { data, error} = await supabase.from('subscriptions')
-    .select()
-    //.eq('email', user.email)
+    const { data, error} = await supabase.from('subscriptions').select().eq('email', user.email)
   
     
     if (error){
