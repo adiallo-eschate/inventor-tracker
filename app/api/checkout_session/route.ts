@@ -1,6 +1,7 @@
 import Stripe from "stripe"
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server"
+//import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/app/api/webhooks/stripe/route"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
