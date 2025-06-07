@@ -18,8 +18,7 @@ export async function POST(request: Request) {
 
     console.log("second")
 
-    const { priceId } = await request.json();
-    const { data } = await request.json();
+    const { priceId, data } = await request.json();
 
     console.log("third")
     console.log("priceId: ", priceId)  
