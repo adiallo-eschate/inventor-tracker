@@ -1,10 +1,5 @@
 "use client";
 
-
-
-
-
-
 export default function PricingPage(){
     
 const handleSubscribe = async (priceId:string) => {

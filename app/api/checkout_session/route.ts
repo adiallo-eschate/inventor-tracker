@@ -101,8 +101,8 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       customer: stripeCustomerId, //?? undefined,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_success',
-      cancel_url: 'https://deadstockalert-l426dwus0-somethingsomethingorothers-projects.vercel.app/stripe/stripe_failure',
+      success_url: 'https://deadstockalert.vercel.app/stripe/stripe_success',
+      cancel_url: 'https://deadstockalert.vercel.app/stripe/stripe_failure',
       metadata:{
         price_id: priceId,
         user_id: user.id,
