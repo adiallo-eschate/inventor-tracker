@@ -8,6 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: Request) {
   try {
+    console.log("first")
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -15,10 +16,12 @@ export async function POST(request: Request) {
         return NextResponse.redirect(new URL('/sign-in', request.url))
     }
 
+    console.log("second")
 
     const { priceId } = await request.json();
     const { data } = await request.json();
 
+    console.log("third")
     console.log("priceId: ", priceId)  
     
 
