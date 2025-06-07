@@ -74,6 +74,7 @@ switch (event.type) {
 
   const { error } = await supabase.from('subscriptions').upsert(
     {
+      user_id: session?.metadata?.user_id,
       stripe_user_id: customerId,
       email,
       plan,
