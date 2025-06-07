@@ -1,6 +1,7 @@
 import Stripe from "stripe"
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server"
+import { useReducer } from "react";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -16,20 +17,15 @@ export async function POST(request: Request) {
 
 
     const { priceId } = await request.json();
+    const { data } = await request.json();
 
-    console.log("priceId: ", priceId)
-
-    const { data, error} = await supabase.from('subscriptions').select()
-  
+    console.log("priceId: ", priceId)  
     
-    if (error){
-      console.log("Could Not Retrieve stripe_user_id from supabase")
-    }
+
     console.log("current users email: ", user.email)
-    console.log("supabase error: ", error)
     console.log("returd from supabase", data)
     
-    let stripeCustomerId = data?.[0]?.stripe_user_id
+    let stripeCustomerId = data?.stripe_user_id
 
     console.log("stripeCustomerid: ", stripeCustomerId)
 
