@@ -28,8 +28,8 @@ export async function POST(request: Request) {
     if (error){
       console.log("Could Not Retrieve stripe_user_id from supabase")
     }
-
     console.log("current users email: ", user.email)
+    console.log("supabase error: ", error)
     console.log("returd from supabase", data)
     
     let stripeCustomerId = data?.[0]?.stripe_user_id
