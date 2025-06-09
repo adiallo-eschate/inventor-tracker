@@ -3,11 +3,15 @@ import { useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNod
 import {createClient} from "@/utils/supabase/client"
 import AddSkuForm from "@/components/ui/addSkuForm";
 import { useRouter } from "next/navigation";
-
+import { checkUser } from "@/app/actions";
 
 export default function Dashboard(){
     const [skus,setSkus] = useState<any>([])
     const [expiredSkus, setExpiredSkus] = useState<any>([])
+
+    checkUser()
+
+
 
     const router = useRouter();
 
