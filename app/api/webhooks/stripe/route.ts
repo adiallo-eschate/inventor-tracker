@@ -150,6 +150,7 @@ case 'customer.subscription.updated': {
   return NextResponse.json({ received: true });
 }
 
+
 function getPlanFromPriceId(priceId: string | undefined) {
   if (!priceId) return 'unknown';
   if (priceId === process.env.STRIPE_FREE_PLAN!) return 'free';
