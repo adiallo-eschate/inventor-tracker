@@ -1,7 +1,13 @@
 "use client";
+import { useEffect } from "react";
+import { checkUser } from "../actions";
 
 export default function PricingPage(){
     
+useEffect(()=>{
+    checkUser()
+}, [])
+
 
 
 const handleSubscribe = async (priceId:string) => {

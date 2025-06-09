@@ -9,8 +9,10 @@ export default function Dashboard(){
     const [skus,setSkus] = useState<any>([])
     const [expiredSkus, setExpiredSkus] = useState<any>([])
 
-    checkUser()
-
+  useEffect(()=>{
+        checkUser()
+    },[])
+    
 
 
     const router = useRouter();
