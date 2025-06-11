@@ -12,13 +12,8 @@ export default async function ProtectedPage() {
 
   if (!user) {
     return redirect("/sign-in");
-  } else {
-    return redirect("/")
-  }
+  } 
 
-  if (user){
-    return redirect("/")
-  }
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">

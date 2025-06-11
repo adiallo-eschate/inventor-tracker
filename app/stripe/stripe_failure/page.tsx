@@ -8,6 +8,7 @@ export default function StripeFailure(){
     useEffect(()=>{
         checkUser()
     },[])
+    
     return (
         <>
             stripe payment failed
