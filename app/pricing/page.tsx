@@ -28,14 +28,14 @@ export default function PricingPage() {
     },
     {
       name: "Starter",
-      description: "Max 50 SKUs. Real-time alerts.",
+      description: "Max 500 SKUs. Real-time alerts.",
       color: "border-indigo-300",
       button: "bg-indigo-600 text-white hover:bg-indigo-700",
       priceId: process.env.STRIPE_STARTER_PLAN!,
     },
     {
       name: "Pro",
-      description: "Max 500 SKUs. Real-time alerts.",
+      description: "1000+ SKUs. Real-time alerts.",
       color: "border-green-300",
       button: "bg-green-600 text-white hover:bg-green-700",
       priceId: process.env.STRIPE_PRO_PLAN!,

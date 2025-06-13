@@ -77,15 +77,15 @@ export default function Home() {
               </div>
               <div className="bg-white p-8 rounded-xl shadow-md flex flex-col items-center text-center border-2 border-indigo-600">
                 <h3 className="text-xl font-semibold mb-2">Starter</h3>
-                <p className="text-gray-600 mb-6">Max 50 SKUs<br />Real-time alerts</p>
-                <span className="text-3xl font-bold text-indigo-600 mb-4">$19/mo</span>
+                <p className="text-gray-600 mb-6">Max 500 SKUs<br />Real-time alerts</p>
+                <span className="text-3xl font-bold text-indigo-600 mb-4">$20/mo</span>
                 <button className="px-6 py-3 mt-auto bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-all">
                     <Link href={user?.aud === 'authenticated' ? "/pricing" : "/sign-up"}>Upgrade Now</Link>
                 </button>
               </div>
               <div className="bg-white p-8 rounded-xl shadow-md flex flex-col items-center text-center">
                 <h3 className="text-xl font-semibold mb-2">Pro</h3>
-                <p className="text-gray-600 mb-6">Max 500 SKUs<br />Real-time alerts</p>
+                <p className="text-gray-600 mb-6"> 1000+ SKUs<br />Real-time alerts</p>
                 <span className="text-3xl font-bold text-indigo-600 mb-4">$49/mo</span>
                 <button className="px-6 py-3 mt-auto bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-all">
                        <Link href={user?.aud === 'authenticated' ? "/pricing" : "/sign-up"}>Upgrade Now</Link>

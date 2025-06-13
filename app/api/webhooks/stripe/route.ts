@@ -164,9 +164,9 @@ function getLimitsForPlan(plan: string) {
     case 'free':
         return { skus: 10 }
     case 'starter':
-      return { skus: 100 };
-    case 'pro':
       return { skus: 500 };
+    case 'pro':
+      return { skus: 1000 };
     default:
       return { skus: 0 };
   }
