@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { checkUser } from "@/app/actions";
 
 export default function Dashboard() {
+  const [loading, setLoading] = useState(false)
   const [cutoffDays, setCutoffDays] = useState<number | null>(null);
   const [skus, setSkus] = useState<any[]>([]);
   const [expiredSkus, setExpiredSkus] = useState<any[]>([]);
@@ -19,6 +20,8 @@ export default function Dashboard() {
 
   const handleDaysFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
     const form = new FormData(e.currentTarget as HTMLFormElement);
 
     const res = await fetch("/api/submit_days", {
@@ -32,6 +35,7 @@ export default function Dashboard() {
     
     const submittedDays = Number(form.get("cuttOffDays"));
     setCutoffDays(submittedDays);
+    setLoading(false)
   };
 
   useEffect(() => {
@@ -103,6 +107,7 @@ export default function Dashboard() {
       required
     />
     <button
+      disabled={loading}
       type="submit"
       className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-all"
     >

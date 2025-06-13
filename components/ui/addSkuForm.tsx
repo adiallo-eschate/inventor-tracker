@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import Link from "next/link"
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function AddSkuForm() {
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function AddSkuForm() {
     } else {
       formRef.current?.reset();
       setSuccess(true);
-      router.reload(); 
+      router.refresh(); 
     }
   };
 
