@@ -18,10 +18,6 @@ function getPlanLimit(plan:string){
     }
 }
 
-function hasExceededUsage(plan: string | undefined, skuCount: number): boolean {
-  const limit = getPlanLimit(plan ?? "free");
-  return skuCount >= limit; 
-}
 
 export async function POST(req:Request){
     const formData = req.formData()
@@ -32,29 +28,37 @@ export async function POST(req:Request){
     const supabase = await createClient()
     const { data:{ user } } = await supabase.auth.getUser()
 
-    const [skusRes, subRes] = await Promise.all([
-      supabase.from("skus").select("id").eq("email", user?.email),
-      supabase.from("subscriptions").select("plan,limits").eq("email", user?.email)
-    ]);
-
-    const skus = skusRes.data;
-    const subs = subRes.data;
-
+    const { data: skus, error: skusError } = await supabase
+      .from("skus")
+      .select("id")
+      .eq("email", user?.email);
+    
+    const { data: subscriptions, error: subsError } = await supabase
+      .from("subscriptions")
+      .select("plan,limits")
+      .eq("email", user?.email);
+    
+    if (skusError || subsError) {
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch usage data." }),
+        { status: 500 }
+      );
+    }
+    
     const sku_count = skus?.length ?? 0;
-
-    const { plan, limits } = subs?.[0] ?? {};
+    
+    const { plan, limits } = subscriptions?.[0] ?? {};
     const maxLimit = limits?.limits ?? getPlanLimit(plan);
-
+    
     console.log({ sku_count, plan, maxLimit });
+    
+    if (sku_count >= maxLimit) {
+      return new Response(
+        JSON.stringify({ error: "SKU usage limit exceeded for your plan." }),
+        { status: 403 }
+      );
+    }
 
-    if (hasExceededUsage(plan, sku_count)) {
-        return new Response(
-          JSON.stringify({ error: "SKU usage limit exceeded for your plan." }),
-          { status: 403 }
-        );
-  }
-
-  
     try{
         const { data:{ user } } = await supabase.auth.getUser()
 

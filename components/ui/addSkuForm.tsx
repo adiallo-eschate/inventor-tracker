@@ -1,11 +1,10 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef } from "react";
 import Link from "next/link"
 
 export default function AddSkuForm() {
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,8 +22,7 @@ export default function AddSkuForm() {
       const result = await res.json();
       setError(result.error || "An error occurred.");
     } else {
-      (e.currentTarget as HTMLFormElement).reset();
-      router.refresh();
+        formRef.current?.reset();
     }
   };
 
