@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import AddSkuForm from "@/components/ui/addSkuForm";
 import { useRouter } from "next/navigation";
 import { checkUser } from "@/app/actions";
 
 export default function Dashboard() {
+  const [cutoffDays, setCutoffDays] = useState<number | null>(null);
   const [skus, setSkus] = useState<any[]>([]);
   const [expiredSkus, setExpiredSkus] = useState<any[]>([]);
   const router = useRouter();
+  const submitFormReset = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     checkUser();
@@ -26,6 +28,10 @@ export default function Dashboard() {
 
     const result = await res.json();
     setExpiredSkus(result.data.data || []);
+    submitFormReset.current?.reset()
+    
+    const submittedDays = Number(form.get("cuttOffDays"));
+    setCutoffDays(submittedDays);
   };
 
   useEffect(() => {
@@ -62,6 +68,7 @@ export default function Dashboard() {
     <p className="text-gray-600">
       Add your product by entering its name, quantity in stock, and the last date it was sold. 
       Then, use the cutoff days field to detect dead stock — you get an alert for products that haven’t sold for the number of days you set.
+      ***Cuttoff days default to 30 days
     </p>
   </div>
 
@@ -77,8 +84,14 @@ export default function Dashboard() {
     <AddSkuForm />
   </div>
 
+   {cutoffDays !== null && (
+      <div className="text-sm text-gray-600 italic mb-2">
+        Current cutoff: <span className="font-semibold">{cutoffDays}</span> days
+      </div>
+    )} 
   
   <form
+    ref={submitFormReset}
     onSubmit={handleDaysFormSubmit}
     className="flex flex-col sm:flex-row items-center gap-4"
   >
