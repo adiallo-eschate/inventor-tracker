@@ -36,6 +36,7 @@ export default function Dashboard() {
     const submittedDays = Number(form.get("cuttOffDays"));
     setCutoffDays(submittedDays);
     setLoading(false)
+    router.refresh()
   };
 
   useEffect(() => {
@@ -72,7 +73,8 @@ export default function Dashboard() {
     <p className="text-gray-600">
       Add your product by entering its name, quantity in stock, and the last date it was sold. 
       Then, use the cutoff days field to detect dead stock — you get an alert for products that haven’t sold for the number of days you set.
-      ***Cuttoff days default to 30 days
+      <p>***Cuttoff days default to 30 days</p>
+      <p>***Dead stock colored red in the table</p>
     </p>
   </div>
 
