@@ -64,7 +64,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mb-20 px-4 w-full">
+        <section id='pricing' className="mb-20 px-4 w-full">
             <h2 className="text-center text-3xl md:text-4xl font-bold text-gray-800 mb-12">Pricing Plans</h2>
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               <div className="bg-white p-8 rounded-xl shadow-md flex flex-col items-center text-center">
