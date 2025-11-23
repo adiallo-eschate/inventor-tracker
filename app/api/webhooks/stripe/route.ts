@@ -62,7 +62,7 @@ switch (event.type) {
 
   const customerId = session.customer as string;
   const email = session.metadata?.customer_email ?? session.customer_email ?? session?.metadata?.customer_email;
-  const userId = session.metadata?.user_id; // optional: for tracking Supabase user
+  const userId = session.metadata?.user_id; 
 
   if (!customerId || !email) {
     console.error('Missing customer_id or email in session metadata');
@@ -121,7 +121,7 @@ case 'customer.subscription.updated': {
         plan,
         limits,
         stripe_info: subscription,
-      }, { onConflict: 'stripe_user_id' }); // assumes stripe_user_id is unique
+      }, { onConflict: 'stripe_user_id' }); 
 
       if (error) {
         console.error('Supabase upsert error (subscription.updated):', error);
